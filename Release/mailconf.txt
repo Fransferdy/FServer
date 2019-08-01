@@ -1,0 +1,14 @@
+smtp.gmail.com
+587
+pkmmmorpgdevs@gmail.com
+PokemonRegionsTeam
+barbosa60794
+ -starttls
+
+
+host
+port
+sender
+alias
+pass
+authentication type

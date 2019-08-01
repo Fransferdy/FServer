@@ -1,0 +1,15 @@
+127.1.0.0
+25
+postmaster@localhost
+PokemonRegionsTeam
+
+
+-------------endofparameters
+
+
+host
+port
+sender
+alias
+pass
+authentication type

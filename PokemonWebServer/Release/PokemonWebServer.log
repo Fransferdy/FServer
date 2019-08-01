@@ -1,0 +1,84 @@
+﻿  stdafx.cpp
+c:\dev\projects\pokemonwebserver\pokemonwebserver\futil.hpp(74): warning C4018: '<': signed/unsigned mismatch
+c:\dev\projects\pokemonwebserver\pokemonwebserver\fserver.hpp(72): warning C4244: 'argument': conversion from 'uint64_t' to 'long', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(613): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(614): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(615): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(616): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(617): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(618): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(619): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(620): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(621): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(622): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(623): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(624): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(625): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(626): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(627): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(628): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(630): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(631): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(632): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(633): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(634): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(655): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(697): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(698): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(703): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(704): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(711): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(716): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(731): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(732): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(734): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(735): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(737): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(738): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(740): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(741): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(743): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(744): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(768): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(769): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(780): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(781): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(791): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\dev\projects\pokemonserverv3\pokemonserverv3\include\player.h(793): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+  buffer.cpp
+  HttpCpp.cpp
+  md5.cpp
+mysqlclient.lib(client_authentication.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(plugin_client.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(net_serv.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(my_default.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(ssl.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(handshake_client.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(my_sha1.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(crypt_genhash_impl.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(my_aes_yassl.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(yassl_int.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(handshake.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(yassl_imp.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(crypto_wrapper.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(asn.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(cert_wrapper.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(integer.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(rsa.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(dsa.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(log_client.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(common.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(handshake.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(my_aes.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(dh.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(algebra.obj) : error LNK2038: mismatch detected for '_MSC_VER': value '1800' doesn't match value '1900' in buffer.obj
+mysqlclient.lib(my_winfile.obj) : error LNK2001: unresolved external symbol ___iob_func
+mysqlclient.lib(log_client.obj) : error LNK2001: unresolved external symbol ___iob_func
+mysqlclient.lib(typelib.obj) : error LNK2001: unresolved external symbol ___iob_func
+mysqlclient.lib(my_default.obj) : error LNK2001: unresolved external symbol ___iob_func
+mysqlclient.lib(my_init.obj) : error LNK2001: unresolved external symbol ___iob_func
+mysqlclient.lib(my_mess.obj) : error LNK2001: unresolved external symbol ___iob_func
+mysqlclient.lib(my_default.obj) : error LNK2001: unresolved external symbol _printf
+mysqlclient.lib(ssl.obj) : error LNK2001: unresolved external symbol __snprintf
+mysqlclient.lib(log_client.obj) : error LNK2001: unresolved external symbol _vfprintf
+C:\Dev\Projects\PokemonWebServer\Release\PokemonWebServer.exe : fatal error LNK1120: 4 unresolved externals

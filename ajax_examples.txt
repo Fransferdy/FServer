@@ -1,0 +1,15 @@
+$.ajax({
+    url: '/news?title=mynewheading&body=thisisyetanotherheading',
+    type: 'PUT',
+    success: function(result) {
+        console.log(result)
+    }
+});
+
+$.ajax({
+    url: '/news?nid=1',
+    type: 'DELETE',
+    success: function(result) {
+        console.log(result)
+    }
+});

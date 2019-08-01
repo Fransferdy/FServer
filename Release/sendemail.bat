@@ -1,0 +1,1 @@
+CMail.exe -host:postmaster@localhost:@192.168.1.33:25 -to:fernando60794@gmail.com -from:postmaster@localhost:PokemonRegionsTeam "-subject:Hello World" "-body:THis is a test email" -head:Content-Type:text/html

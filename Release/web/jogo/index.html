@@ -1,0 +1,32 @@
+<html>
+	<head>
+		<title>Ghost Run</title>
+		<style>
+			body { margin: 0; }
+			
+		</style>
+	</head>
+	<body>
+  <div align="center">
+    <canvas id="game-canvas" width="480" height="320"></canvas>
+  </div>
+		<script src="js/howler.min.js"></script>
+		<script src="js/pixi.min.js"></script>
+		<script src="js/game.js"></script>
+
+		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+		<script>
+
+		$(window).on('load', function(){
+
+		window.focus();
+
+		})
+
+		document.onmousedown = function() {window.focus();};
+
+		</script>
+
+	</body>
+</html>

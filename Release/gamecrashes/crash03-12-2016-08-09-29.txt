@@ -1,0 +1,18 @@
+User input:
+""
+Crash Info 
+
+"ERROR!!! :: ############################################################################################
+FATAL ERROR in
+action number 1
+of Draw Event
+for object client:
+
+
+Push :: Execution Error - Variable Get -1.mana(100817, 0)
+ at gml_Object_client_Draw_0 (line -1) - <unknown source line>
+############################################################################################
+
+--------------------------------------------------------------------------------------------
+Self Variables : 
+"

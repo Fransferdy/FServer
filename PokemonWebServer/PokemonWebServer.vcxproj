@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3426FDD0-1C49-4B39-9250-9106444A5DB5}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>PokemonWebServer</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Dev\LibrariesAndTools\Libraries\mysql-connector-c-6.1.9-win32\mysql-connector-c-6.1.9-win32\include;C:\Dev\Projects\PokemonServerV3\PokemonServerV3\BattleSystem;C:\Dev\Projects\PokemonServerV3\PokemonServerV3\F39dll;C:\Dev\Projects\PokemonServerV3\PokemonServerV3\include;C:\Dev\LibrariesAndTools\Libraries\libmicrohttpd-latest\libmicrohttpd-0.9.50\w32\VS2013\Output;C:\Dev\LibrariesAndTools\Libraries\jsoncppinstall\include;$(IncludePath);C:\Dev\LibrariesAndTools\Libraries\sqlite-dll-win32-x86-3160200\include</IncludePath>
+    <LibraryPath>C:\Dev\LibrariesAndTools\Libraries\mysql-connector-c-6.1.9-win32\mysql-connector-c-6.1.9-win32\lib\vs12;C:\Dev\LibrariesAndTools\Libraries\libmicrohttpd-latest\libmicrohttpd-0.9.50\w32\VS2013\Output;C:\Dev\LibrariesAndTools\Libraries\jsoncppinstall\lib;C:\Dev\LibrariesAndTools\Libraries\sqlite-dll-win32-x86-3160200;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Dev\LibrariesAndTools\Libraries\mysql-connector-c-6.1.9-win32\mysql-connector-c-6.1.9-win32\include;C:\Dev\Projects\PokemonServerV3\PokemonServerV3\BattleSystem;C:\Dev\Projects\PokemonServerV3\PokemonServerV3\F39dll;C:\Dev\Projects\PokemonServerV3\PokemonServerV3\include;C:\Dev\LibrariesAndTools\Libraries\jsoncppinstall\include;C:\Dev\LibrariesAndTools\Libraries\libmicrohttpd-latest\libmicrohttpd-0.9.50\w32\VS2013\Output;$(IncludePath);C:\Dev\LibrariesAndTools\Libraries\sqlite-dll-win32-x86-3160200\include</IncludePath>
+    <LibraryPath>C:\Dev\LibrariesAndTools\Libraries\mysql-connector-c-6.1.9-win32\mysql-connector-c-6.1.9-win32\lib\vs12;C:\Dev\LibrariesAndTools\Libraries\libmicrohttpd-latest\libmicrohttpd-0.9.50\w32\VS2013\Output;C:\Dev\LibrariesAndTools\Libraries\jsoncppinstall\lib;C:\Dev\LibrariesAndTools\Libraries\sqlite-dll-win32-x86-3160200;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libmicrohttpd-dll_d.lib;%(AdditionalDependencies);sqlite3.lib;mysqlclient.lib</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /d /y "C:\Dev\LibrariesAndTools\Libraries\libmicrohttpd-latest\libmicrohttpd-0.9.50\w32\VS2013\Output\libmicrohttpd-dll_d.dll" "$(OutDir)"
+xcopy /d /y "$(SolutionDir)cmail" "$(OutDir)"
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>libmicrohttpd-dll.lib;%(AdditionalDependencies);sqlite3.lib;mysqlclient.lib</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /d /y "C:\Dev\LibrariesAndTools\Libraries\libmicrohttpd-latest\libmicrohttpd-0.9.50\w32\VS2013\Output\libmicrohttpd-dll.dll" "$(OutDir)"
+xcopy /d /y "C:\Dev\LibrariesAndTools\Libraries\sqlite-dll-win32-x86-3160200\sqlite3.dll" "$(OutDir)"
+xcopy /d /y "$(SolutionDir)cmail" "$(OutDir)"
+
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\PokemonServerV3\PokemonServerV3\BattleSystem\Constants.h" />
+    <ClInclude Include="..\..\PokemonServerV3\PokemonServerV3\include\DataContainer.h" />
+    <ClInclude Include="..\..\PokemonServerV3\PokemonServerV3\include\player.h" />
+    <ClInclude Include="AccountJSON.h" />
+    <ClInclude Include="AdminLoginJSON.h" />
+    <ClInclude Include="Contact.h" />
+    <ClInclude Include="DatabaseCore.h" />
+    <ClInclude Include="ErrorReport.h" />
+    <ClInclude Include="FConstants.hpp" />
+    <ClInclude Include="ForgotPassword.h" />
+    <ClInclude Include="FPage.hpp" />
+    <ClInclude Include="FServer.hpp" />
+    <ClInclude Include="FUtil.hpp" />
+    <ClInclude Include="GlobalConfig.h" />
+    <ClInclude Include="HomePage.h" />
+    <ClInclude Include="json.hpp" />
+    <ClInclude Include="LauncherNews.h" />
+    <ClInclude Include="LoginJSON.h" />
+    <ClInclude Include="md5.h" />
+    <ClInclude Include="NewsJSON.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\PokemonServerV3\PokemonServerV3\F39dll\buffer.cpp" />
+    <ClCompile Include="HttpCpp.cpp" />
+    <ClCompile Include="md5.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
