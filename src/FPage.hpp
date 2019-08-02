@@ -33,7 +33,7 @@ public:
 	}
 };
 
-class FSession
+class FRequest
 {
 public:
 	std::string method;
@@ -48,16 +48,9 @@ public:
 class FPage
 {
 protected:
-	struct MHD_Connection *connection;
-	std::map <std::string, std::string> *parameters;
-	std::map <std::string, FCookie> *newcookies;
-	std::map <std::string, std::string> *cookies;
-	std::map <std::string, std::string> *responseHeaders;
-	std::map <std::string, std::string> *requestHeaders;
-	std::string mime;
+	FRequest *request;
 
-	std::map <std::string, std::string> *getRequestHeaders()
-	{return requestHeaders;};
+	
 	/*
 	Get a parameter from URI or POST
 	@param = key
@@ -66,7 +59,7 @@ protected:
 	{
 		try
 		{
-			return parameters->at(param);
+			return request->parameters.at(param);
 		}
 		catch (std::exception e)
 		{
@@ -89,7 +82,7 @@ protected:
 	{
 		try
 		{
-			FCookie f = newcookies->at(cookie);
+			FCookie f = request->newcookies.at(cookie);
 			if (std::difftime(f.time, std::time(nullptr))>0)
 				return f.value;
 			return "NaN";
@@ -98,7 +91,7 @@ protected:
 		{
 			try
 			{
-				return cookies->at(cookie);
+				return request->cookies.at(cookie);
 			}
 			catch (std::exception e)
 			{
@@ -117,7 +110,7 @@ protected:
 	void pageSetC(std::string key, std::string value, std::string path = "")
 	{
 		FCookie f(value);
-		auto element = newcookies->emplace(key, f);
+		auto element = request->newcookies.emplace(key, f);
 		if (element.second == 0)
 		{
 			element.first->second = f;
@@ -128,8 +121,8 @@ protected:
 	void addResponseHeader(std::string headerName, std::string value, boolean overwrite=false)
 	{
 		if (overwrite)
-			responseHeaders->erase(headerName);
-		auto element = responseHeaders->emplace(headerName,value);
+			request->responseHeaders.erase(headerName);
+		auto element = request->responseHeaders.emplace(headerName,value);
 	}
 
 	/*
@@ -138,7 +131,7 @@ protected:
 	void pageSetC(std::string key, std::string value, std::time_t time, std::string path = "")
 	{
 		FCookie f(value, time, path);
-		auto element = newcookies->emplace(key, f);
+		auto element = request->newcookies.emplace(key, f);
 		if (element.second == 0)
 		{
 			element.first->second = f;
@@ -151,7 +144,7 @@ protected:
 	void pageExpireC(std::string key)
 	{
 		FCookie f("v", (std::time(nullptr) - 31536000));
-		auto element = newcookies->emplace(key, f);
+		auto element = request->newcookies.emplace(key, f);
 		if (element.second == 0)
 		{
 			element.first->second = f;
@@ -164,9 +157,13 @@ public:
 
 	std::string out;
 
+	std::map <std::string, std::string> *getRequestHeaders()
+	{return &(request->requestHeaders);};
+	std::map <std::string, std::string> *getResponseHeaders()
+	{return &(request->responseHeaders);};
+
 	FPage()
 	{
-		mime = "text/html";
 	}
 
 	/*
@@ -175,6 +172,13 @@ public:
 	*/
 	std::string getMime()
 	{
+		auto mime = "";
+		try{
+		auto mime = request->responseHeaders.at("Content-Type");
+		}catch(std::exception e)
+		{
+			std::cout<<"Tring to get mime, but it does not exist" << std::endl;
+		}
 		return mime;
 	}
 
@@ -186,7 +190,7 @@ public:
 	*/
 	void setMime(std::string arg)
 	{
-		mime = arg;
+		addResponseHeader("Content-Type",arg,true);
 	}
 
 	void setOut(std::string arg)
@@ -196,18 +200,14 @@ public:
 
 	std::map <std::string, FCookie> * getNewCookiesMap()
 	{
-		return newcookies;
+		return &(request->newcookies);
 	}
 	/*
 	For Internal Use Only
 	*/
-	void setUpPage(struct MHD_Connection *con, std::map <std::string, std::string> *parametersarg, std::map <std::string, FCookie> *newcookiesarg, std::map <std::string, std::string> *cookiesarg,std::map <std::string, std::string> *requestHeadersarg)
+	void setUpPage(FRequest *requestarg)
 	{
-		connection = con;
-		parameters = parametersarg;
-		cookies = cookiesarg;
-		newcookies = newcookiesarg;
-		requestHeaders = requestHeadersarg;
+		request = requestarg;
 	}
 
 

@@ -22,7 +22,10 @@ fserver.exe: $(OBJ)
 $(ODIR)/%.o: %.cpp $(DEP_FILES) $(DEP_FILES2)
 	$(CC) -o $@ -c $< $(CPPFLAGS)
 
-
+test1: src/application/app1.o
+	$(CC) -shared -Wl,--dll $^ -o src/application/app1.dll
+obj/application/app1.o: src/application/app1.cpp
+	$(CC) -o $@ -c $< $(CPPFLAGS)
 
 .PHONY: clean cleanall
 clean: 

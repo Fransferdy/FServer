@@ -18,20 +18,19 @@ std::string ExePath()
 
 int main()
 {
-	std::string name ("/home");
-	server.addPages({ name, [](){return new HomePage();} });
+	server.addPages({ "/home", [](){return new HomePage();} });
 	server.addReplaceRule("/*/","/index.html",false);
-	server.setLog(false);
+	server.setLog(true);
 	server.start(8888, ExePath()+"\\web\\");
 	std::cout << "Server is Live " << std::endl;
 
 	while (true)
 	{
-		system("pause");
+		Sleep(5);
 	}
 	
 	return 0;
-} 
+}
 
  
 

@@ -12,10 +12,12 @@ class HomePage : public FPage
 
 	virtual void doGet()
 	{
+		
 		json::JSON obj;
 		setMime("application/json");
 		obj["array"] = json::Array(true, "Two", 3, 4.0);
 		setOut(obj.dump());
+		addResponseHeader("Lucao","WoW");
 		/*
 		json::JSON obj;
 		// Create a new Array as a field of an Object.

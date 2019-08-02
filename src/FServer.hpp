@@ -80,7 +80,7 @@ protected:
 
 	virtual void completed(void *cls, struct MHD_Connection *connection,void **con_cls, enum MHD_RequestTerminationCode toe)
 	{
-		FSession *session = (FSession*)*con_cls;
+		FRequest *session = (FRequest*)*con_cls;
  
 		if (NULL == session)
 			return;
@@ -94,16 +94,21 @@ protected:
 		*con_cls = NULL;
 	}
 
+	void printAndWait(std::string what)
+	{
+		std::cout << what << std::endl;
+		system("pause");
+	};
+	
 	virtual int answer(void *cls, struct MHD_Connection *connection, const char *url, const char *method, const char *version, const char *upload_data, size_t *upload_data_size, void **con_cls)
 	{
 		int ret;
 		struct MHD_Response *response;
-		FSession *session;
+		FRequest *session;
 		char * myOut;
-
 		if (*con_cls==NULL)
 		{
-			session = new FSession();
+			session = new FRequest();
 			if (NULL == session)
 				return MHD_NO;
 
@@ -129,13 +134,11 @@ protected:
 					return MHD_NO;
 				}
 			}
-
 			*con_cls = (void *)session;
 			return MHD_YES;
 		}
 
-		session = (FSession*)*con_cls;
-
+		session = (FRequest*)*con_cls;
 		try
 		{
 			if (log)
@@ -143,8 +146,7 @@ protected:
 			FPage *answerPage = pages.at(url)();
 			std::string endCookie;
 			std::map <std::string, FCookie> *newcookiesmap;
-
-			answerPage->setUpPage(connection, &session->parameters, &session->newcookies, &session->cookies,&session->requestHeaders);
+			answerPage->setUpPage(session);
 
 			try
 			{
@@ -197,8 +199,13 @@ protected:
 				(void *)myOut,
 				MHD_RESPMEM_MUST_FREE);
 
-			MHD_add_response_header(response, "Content-Type", answerPage->getMime().c_str());
-
+			std::map<std::string, std::string> *responseHeaders = answerPage->getResponseHeaders();
+			//add response headers
+			for ( auto it = responseHeaders->begin(); it != responseHeaders->end(); it++ )
+			{
+				MHD_add_response_header(response, it->first.c_str(), it->second.c_str());
+			}
+			
 			newcookiesmap = answerPage->getNewCookiesMap();
 			for (std::map<std::string, FCookie>::iterator it = newcookiesmap->begin(); it != newcookiesmap->end(); ++it)
 			{
@@ -293,8 +300,7 @@ public:
 		rule.second.first = state;
 		rule.second.second = newPath;
 		replaceRules.insert(rule);
-		
-	}  
+	}
 
 	void changeReplaceRuleState(std::string pathToReplace, boolean state)
 	{
