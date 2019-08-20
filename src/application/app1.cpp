@@ -1,9 +1,44 @@
 #include <iostream>
 #include <windows.h>
 
+#include <iostream>
+#include <string>
+#include <map>
+#include <functional>
+#include <algorithm>
+#include "FPage.hpp"
+#include "FApplication.hpp"
+
 #define DLLAPI __declspec(dllexport)
 
-MyApplication application;
+
+Fapplication application;
+
+char* executepage(char * bufferizedRequest, char* pageMapping,int length)
+{
+    FRequest request;
+    CBuffer buffer;
+    buffer.addBuffer(bufferizedRequest,length);
+    request.readFromBuffer(&buffer);
+    application.answer(&request,pageMapping);
+    buffer.clear();
+    buffer.writeint(0);
+    request.writeToBuffer(&buffer);
+    buffer.replaceint(buffer.BuffSize,0);
+    return buffer.data;
+}
+
+
+extern "C"
+{
+    char* executepage(char * source)
+    {
+        return executePage(source); 
+    }
+}
+
+
+
 
 extern "C" DLLAPI BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD reason_for_call, LPVOID lpvReserved)
 {
