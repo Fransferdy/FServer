@@ -36,6 +36,30 @@ static int post_iterator(void *cls,enum MHD_ValueKind kind,const char *key,const
 }
 
 
+class FApplicationDefinition
+{
+public:
+	std::map<std::string, boolean > pages;
+	std::map<std::string, std::pair<bool, std::string> > replaceRules;
+	
+	void readFromBuffer(CBuffer *buffer)
+	{
+		auto size = buffer->readint();
+		for ( size_t i = 0; i< size; i++)
+		{
+			pages.insert(std::pair<std::string, boolean>(buffer->readstring(),true) );
+		}
+
+		size = buffer->readint();
+		bool ruleState = false;
+		for ( size_t i = 0; i< size; i++)
+		{
+			replaceRules.insert(std::pair<std::string, std::pair<bool, std::string> >(buffer->readstring(), std::pair<bool, std::string>(buffer->readdouble,buffer->readstring()) ) );
+		}
+	}
+
+};
+
 class FServer
 {
 private:

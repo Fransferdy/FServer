@@ -14,26 +14,47 @@
 
 Fapplication application;
 
-char* executepage(char * bufferizedRequest, char* pageMapping,int length)
+char* executePagepp(char * bufferizedRequest, char* pageMapping,int bufferLength)
 {
     FRequest request;
     CBuffer buffer;
-    buffer.addBuffer(bufferizedRequest,length);
+    buffer.addBuffer(bufferizedRequest,bufferLength);
     request.readFromBuffer(&buffer);
     application.answer(&request,pageMapping);
+
     buffer.clear();
     buffer.writeint(0);
     request.writeToBuffer(&buffer);
     buffer.replaceint(buffer.BuffSize,0);
-    return buffer.data;
+
+    char * retData = (char*)malloc(buffer.BuffSize);
+    memcpy(retData,buffer.data,buffer.BuffSize);
+
+    return retData;
+}
+
+char * getApplicationDefinitions()
+{
+    CBuffer buffer;
+    buffer.clear();
+    buffer.writeint(0);
+    application.writeToBuffer(&buffer);
+    buffer.replaceint(buffer.BuffSize,0);
+    char * retData = (char*)malloc(buffer.BuffSize);
+    memcpy(retData,buffer.data,buffer.BuffSize);
+    return retData;
 }
 
 
 extern "C"
 {
-    char* executepage(char * source)
+    DLLAPI char* executepage(char * source,char* pageMapping,int bufferLength)
     {
-        return executePage(source); 
+        return executePagepp(source,pageMapping,bufferLength); 
+    }
+    DLLAPI char* getApp()
+    {
+        return getApplicationDefinitions();
     }
 }
 
@@ -47,6 +68,7 @@ extern "C" DLLAPI BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD reason_for_cal
         case DLL_PROCESS_ATTACH:
             // attach to process
             application.start();
+            std::cout << "P Sizes: " << application.getPagesAmount() << std::endl;
             printf("DLL PROCESS ATTACHED\n");
             // return FALSE to fail DLL load
             break;
@@ -65,6 +87,8 @@ extern "C" DLLAPI BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD reason_for_cal
             printf("DLL THREAD DETTACHED\n");
             // detach from thread
             break;
+        default:
+            printf("UNRECOGNIZED REASON, %d",reason_for_call);
     }
     return TRUE; // succesful
 }

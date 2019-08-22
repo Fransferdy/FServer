@@ -23,3 +23,5 @@
 #include "FUtil.hpp"
 
 #include "FilesManager.hpp"
+
+#include "CBuffer.h"

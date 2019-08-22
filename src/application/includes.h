@@ -16,3 +16,4 @@
 #include <algorithm>
 
 #include "CBuffer.h"
+#include "FPage.hpp"

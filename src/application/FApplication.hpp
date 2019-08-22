@@ -6,6 +6,7 @@
 #include <functional>
 #include <algorithm>
 #include "FPage.hpp"
+#include "HomePage.h"
 
 #define FHTTP_GET "GET"
 #define FHTTP_POST "POST"
@@ -73,6 +74,11 @@ public:
 		replaceRules.insert(rule);
 	}
 
+	size_t getPagesAmount()
+	{
+		return pages.size();
+	}
+
 	void changeReplaceRuleState(std::string pathToReplace, boolean state)
 	{
 		auto it = replaceRules.find(pathToReplace);
@@ -85,9 +91,9 @@ public:
 		pages.insert(page);
 	}
 
-	virtual int start()
+	virtual void start()
 	{
-		//addPage( { "/index", [](){return new HomePage(); } } );
+		addPage( { "/index", [](){return new HomePage(); } } );
     }
 
 	void writeToBuffer(CBuffer *buffer)
@@ -101,7 +107,33 @@ public:
 		for ( auto it = replaceRules.begin(); it != replaceRules.end(); it++ )
 		{
 			buffer->writestring((char*)it->first.c_str());
-			buffer->writestring((char*)it->second.c_str());
+			buffer->writebyte(it->second.first);
+			buffer->writestring((char*)it->second.second.c_str());
+			
+		}
+	}
+
+};
+
+class FApplicationDefinition
+{
+public:
+	std::map<std::string, boolean > pages;
+	std::map<std::string, std::pair<bool, std::string> > replaceRules;
+	
+	void readFromBuffer(CBuffer *buffer)
+	{
+		auto size = buffer->readint();
+		for ( size_t i = 0; i< size; i++)
+		{
+			pages.insert(std::pair<std::string, boolean>(buffer->readstring(),true) );
+		}
+
+		size = buffer->readint();
+		bool ruleState = false;
+		for ( size_t i = 0; i< size; i++)
+		{
+			replaceRules.insert(std::pair<std::string, std::pair<bool, std::string> >(buffer->readstring(), std::pair<bool, std::string>(buffer->readdouble,buffer->readstring()) ) );
 		}
 	}
 
