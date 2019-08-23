@@ -35,53 +35,28 @@ static int post_iterator(void *cls,enum MHD_ValueKind kind,const char *key,const
 	return MHD_YES;
 }
 
+typedef char* (__cdecl *ExecutePageProc)(char * bufferizedRequest,char* url,int length);
 
 class FApplicationDefinition
 {
 public:
+	std::string appName;
+	std::string defaultIndexName;
 	std::map<std::string, boolean > pages;
 	std::map<std::string, std::pair<bool, std::string> > replaceRules;
-	
-	void readFromBuffer(CBuffer *buffer)
+	ExecutePageProc executePage;
+	void *dllHandle;
+
+	FApplicationDefinition(std::string appNameArg, ExecutePageProc executePageArg,void *dllHandleArg)
 	{
-		auto size = buffer->readint();
-		for ( size_t i = 0; i< size; i++)
-		{
-			pages.insert(std::pair<std::string, boolean>(buffer->readstring(),true) );
-		}
-
-		size = buffer->readint();
-		bool ruleState = false;
-		for ( size_t i = 0; i< size; i++)
-		{
-			replaceRules.insert(std::pair<std::string, std::pair<bool, std::string> >(buffer->readstring(), std::pair<bool, std::string>(buffer->readdouble,buffer->readstring()) ) );
-		}
+		appName = appNameArg;
+		executePage = executePageArg;
+		dllHandle = dllHandleArg;
 	}
-
-};
-
-class FServer
-{
-private:
-	struct MHD_Daemon *daemon;
-	int status;
-	int port;
-	bool log;
-
-	template<typename T>
-	static int callBack(void *cls, struct MHD_Connection *connection, const char *url, const char *method, const char *version, const char *upload_data, size_t *upload_data_size, void **con_cls)
+	~FApplicationDefinition()
 	{
-		return static_cast<T *>(cls)->answer(cls, connection, url, method, version, upload_data, upload_data_size, con_cls);
+		FreeLibrary((HINSTANCE)dllHandle);
 	}
-
-	static void completedCallBack(void *cls, struct MHD_Connection *connection,void **con_cls, enum MHD_RequestTerminationCode toe)	{
-		return static_cast<FServer *>(cls)->completed(cls, connection, con_cls, toe);
-	}
-
-protected:
-	std::map<std::string, std::function<FPage*()> > pages;
-	std::map<std::string, std::pair<bool, std::string> > replaceRules;
-	std::string rootPath;
 
 	std::string applyReplaceRule(std::string url)
 	{
@@ -102,6 +77,64 @@ protected:
 		return retString;
 	}
 
+	void readFromBuffer(CBuffer *buffer)
+	{
+		auto size = buffer->readint();
+		for ( size_t i = 0; i< size; i++)
+		{
+			pages.insert(std::pair<std::string, boolean>(buffer->readstring(),true) );
+		}
+
+		size = buffer->readint();
+		bool ruleState = false;
+		for ( size_t i = 0; i< size; i++)
+		{
+			replaceRules.insert(std::pair<std::string, std::pair<bool, std::string> >(buffer->readstring(), std::pair<bool, std::string>(buffer->readdouble,buffer->readstring()) ) );
+		}
+		defaultIndexName = buffer->readstring();
+	}
+
+	void printMe()
+	{
+		std::cout << "App Name/Path: " << appName << std::endl;
+		std::cout << "Default HomePage: " << defaultIndexName <<std::endl;
+
+		std::cout << "Pages Amount: " << pages.size() << std::endl;
+		for ( auto it = pages.begin(); it != pages.end(); it++ )
+		{
+			std::cout << "Page: " << it->first << std::endl;
+		}
+		std::cout << "Replace Rules Amount: " << replaceRules.size() << std::endl;
+		for ( auto it = replaceRules.begin(); it != replaceRules.end(); it++ )
+		{
+			std::cout << "Find For: " << it->first << " - Replace With: " << it->second.second << " Active? "<< it->second.first <<  std::endl;
+		}
+	}
+
+};
+
+class FServer
+{
+private:
+	std::map<std::string,FApplicationDefinition*> applications;
+
+	struct MHD_Daemon *daemon;
+	int status;
+	int port;
+	bool log;
+
+	template<typename T>
+	static int callBack(void *cls, struct MHD_Connection *connection, const char *url, const char *method, const char *version, const char *upload_data, size_t *upload_data_size, void **con_cls)
+	{
+		return static_cast<T *>(cls)->answer(cls, connection, url, method, version, upload_data, upload_data_size, con_cls);
+	}
+
+	static void completedCallBack(void *cls, struct MHD_Connection *connection,void **con_cls, enum MHD_RequestTerminationCode toe)	{
+		return static_cast<FServer *>(cls)->completed(cls, connection, con_cls, toe);
+	}
+
+protected:
+	std::string rootPath;
 	virtual void completed(void *cls, struct MHD_Connection *connection,void **con_cls, enum MHD_RequestTerminationCode toe)
 	{
 		FRequest *session = (FRequest*)*con_cls;
@@ -163,11 +196,70 @@ protected:
 		}
 
 		session = (FRequest*)*con_cls;
+
+		std::string stdurl = url;
+		//stdurl = applyReplaceRule(stdurl);
+
+		if (log)
+		{
+			std::cout << url << std::endl;
+			std::cout << "After Replace Rules: " << stdurl << std::endl;
+		}
+		std::string selectAppName;
+		std::string requestedPath;
+
+		selectAppName = stdurl.substr(1);
+		size_t barPos = selectAppName.find("/");
+		if (barPos!=std::string::npos)
+		{
+			requestedPath = selectAppName.substr(barPos,std::string::npos);
+			selectAppName = "/" + selectAppName.substr(0,barPos);
+			
+		}
+		else
+		{
+			selectAppName = "/" + selectAppName;
+			requestedPath = "";
+		}
+		std::cout << "AppName " << selectAppName << " Request Path: " <<  requestedPath << std::endl;
+		
+		FApplicationDefinition* selectedApp = NULL;
+		try{
+			selectedApp = applications.at(selectAppName);
+			if (requestedPath.compare("")==0)
+				requestedPath = selectedApp->defaultIndexName;
+		}catch(std::out_of_range e)
+		{
+			std::cout << "Base Path - App Not Found" << std::endl;
+			ret = MHD_queue_response(connection, MHD_HTTP_NOT_FOUND, response);
+			MHD_destroy_response(response);
+			return ret;
+		}
+
 		try
 		{
-			if (log)
-				std::cout << url << std::endl;
-			FPage *answerPage = pages.at(url)();
+			bool pageExist = selectedApp->pages.at(requestedPath);
+			session->method = method;
+			CBuffer buffer;
+			buffer.clear();
+			session->writeToBuffer(&buffer);
+			char * filledRequest = selectedApp->executePage(buffer.data,(char*)requestedPath.c_str(),buffer.BuffSize);
+			int *filledRequestSize = (int*)filledRequest;
+
+			FRequest *newSession = new FRequest();
+			buffer.clear();
+			buffer.addBuffer(filledRequest,*filledRequestSize);
+			buffer.readint();
+			newSession->readFromBuffer(&buffer);
+			newSession->pp = session->pp;
+			delete session;
+			session = newSession;
+
+			std::cout << session->response;
+
+			return MHD_YES;
+
+			FPage *answerPage;// = (*selectedApp).pages.at(stdurl)();
 			std::string endCookie;
 			std::map <std::string, FCookie> *newcookiesmap;
 			answerPage->setUpPage(session);
@@ -247,9 +339,7 @@ protected:
 		catch (std::out_of_range e)
 		{
 			//std::cout << "Looking for file " << url << std::endl;
-			std::string stdurl = url;
-			stdurl = applyReplaceRule(stdurl);
-
+			
 			if (log)
 				std::cout << "Modified URL" << stdurl << std::endl;
 
@@ -317,26 +407,19 @@ public:
 		log = state;
 	}
 
-	void addReplaceRule(std::string pathToReplace, std::string newPath, boolean state = false)
+	void addReplaceApplication(std::string appName,FApplicationDefinition * newApp)
 	{
-		std::pair<std::string, std::pair<boolean, std::string>> rule;
-		rule.first = pathToReplace;
-		rule.second.first = state;
-		rule.second.second = newPath;
-		replaceRules.insert(rule);
+		FApplicationDefinition *oldApp;
+		try{
+			oldApp = applications.at(appName);
+			delete oldApp;
+			applications.erase(appName);
+		}catch(std::out_of_range e)
+		{
+		}
+		applications.insert(std::pair<std::string,FApplicationDefinition*>(appName,newApp));
 	}
 
-	void changeReplaceRuleState(std::string pathToReplace, boolean state)
-	{
-		auto it = replaceRules.find(pathToReplace);
-		if (it != replaceRules.end())
-			it->second.first = state;	
-	}
-
-	void addPages(std::pair<std::string, std::function<FPage*()>> page)
-	{
-		pages.insert(page);
-	}
 	virtual int start(int portarg, std::string serverpath)
 	{
 		port = portarg;

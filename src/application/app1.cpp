@@ -14,6 +14,12 @@
 
 Fapplication application;
 
+	void printAndWait(std::string what)
+	{
+		std::cout << what << std::endl;
+		system("pause");
+	};
+    
 char* executePagepp(char * bufferizedRequest, char* pageMapping,int bufferLength)
 {
     FRequest request;

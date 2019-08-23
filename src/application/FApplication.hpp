@@ -14,14 +14,14 @@
 #define FHTTP_PUT "PUT"
 #define FHTTP_DELETE "DELETE"
 #define FHTTP_HEAD "HEAD"
-#define FHTTP_HEAD "OPTIONS"
+#define FHTTP_OPTIONS "OPTIONS"
 
 class Fapplication
 {
 protected:
 	std::map<std::string, std::function<FPage*()> > pages;
 	std::map<std::string, std::pair<bool, std::string> > replaceRules;
-
+	std::string defaultIndexName;
 	void printAndWait(std::string what)
 	{
 		std::cout << what << std::endl;
@@ -35,23 +35,26 @@ public:
 		answerPage->setUpPage(request);
 		try
 		{
-			if (request->method.compare("GET") == 0)
+			if (request->method.compare(FHTTP_GET) == 0)
 				answerPage->doGet();
 			else
-				if (request->method.compare("POST") == 0)
+				if (request->method.compare(FHTTP_POST) == 0)
 					answerPage->doPost();
 				else
-					if (request->method.compare("PUT") == 0)
+					if (request->method.compare(FHTTP_PUT) == 0)
 						answerPage->doPut();
 					else
-						if (request->method.compare("PATCH") == 0)
+						if (request->method.compare(FHTTP_PATCH) == 0)
 							answerPage->doPatch();
 						else
-							if (request->method.compare("DELETE") == 0)
+							if (request->method.compare(FHTTP_DELETE) == 0)
 								answerPage->doDelete();
 							else
-								if (request->method.compare("OPTIONS") == 0)
-									answerPage->doOptions();
+								if (request->method.compare(FHTTP_HEAD) == 0)
+									answerPage->doHead();
+								else
+									if (request->method.compare(FHTTP_OPTIONS) == 0)
+										answerPage->doOptions();
 		} catch (std::exception e)
 		{
 			answerPage->setOut("POTATO ERR");
@@ -59,10 +62,14 @@ public:
 		delete answerPage;
 	}
 
-public:
 	/*
 		Example addPages( { "/home", [](){return new HomePage(); } } )
 	*/
+
+	size_t getPagesAmount()
+	{
+		return pages.size();
+	}
 
     /*Adds a regex replace rule for urls*/
 	void addReplaceRule(std::string pathToReplace, std::string newPath, boolean state = false)
@@ -72,11 +79,6 @@ public:
 		rule.second.first = state;
 		rule.second.second = newPath;
 		replaceRules.insert(rule);
-	}
-
-	size_t getPagesAmount()
-	{
-		return pages.size();
 	}
 
 	void changeReplaceRuleState(std::string pathToReplace, boolean state)
@@ -93,6 +95,7 @@ public:
 
 	virtual void start()
 	{
+		defaultIndexName = "/index";
 		addPage( { "/index", [](){return new HomePage(); } } );
     }
 
@@ -111,6 +114,7 @@ public:
 			buffer->writestring((char*)it->second.second.c_str());
 			
 		}
+		buffer->writestring((char*)defaultIndexName.c_str());
 	}
 
 };

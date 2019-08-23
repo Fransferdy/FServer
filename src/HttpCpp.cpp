@@ -14,7 +14,9 @@ std::string ExePath()
 	return std::string(buffer).substr(0, pos);
 }
 
+//imported function typedefs
 
+typedef char* (__cdecl *GetAppProc)(void);
 
 int main()
 {
@@ -27,8 +29,12 @@ int main()
 	std::string appsDir = fmag.getBaseDir();
 	for(int i=0;i<files.size();i++)
 	{
-		if (files[i].name.find(".dll")!=std::string::npos)
+		std::size_t endPos = files[i].name.find(".dll");
+		if (endPos!=std::string::npos)
 		{
+			std::string appName = "/"+files[i].name.substr(0,endPos);
+			std::cout << "AppName " << appName <<std::endl;
+
 			std::cout << appsDir << files[i].path << files[i].name << std::endl;
 
 			HINSTANCE temp = LoadLibraryA( (appsDir+files[i].path+files[i].name).c_str() );
@@ -40,40 +46,25 @@ int main()
 			}
 			modules.insert(std::pair<std::string,HINSTANCE>(files[i].name,temp));
 
-
-			typedef char* (__cdecl *ExecutePageProc)(char *,char*,int);
-			typedef char* (__cdecl *GetAppProc)(void);
-
-			// Load the functions. This may or may not work, based on
-			// your compiler. If your compiler created a '.def' file
-			// with your DLL, copy the function names from that to
-			// these functions. Look up 'name mangling' if you want
-			// to know why this happens.
 			ExecutePageProc executePage = (ExecutePageProc)GetProcAddress(temp, "executepage");
 			GetAppProc getApp = (GetAppProc)GetProcAddress(temp, "getApp");
 
-			FApplicationDefinition app;
+			FApplicationDefinition *newApp = new FApplicationDefinition(appName,executePage,(void*)temp);
+
 			CBuffer buffer;
 			char *dataBuffer = getApp();
 			int *dataSize = (int*)dataBuffer;
-			std::cout << "Size "<< (*dataSize) << std::endl;
-
 			buffer.addBuffer(dataBuffer,(*dataSize));
 			buffer.readint();
-			app.readFromBuffer(&buffer);
-			std::cout << "Pages "<< app.pages.size() << std::endl;
-			for (auto it = app.pages.begin(); it!=app.pages.end();it++)
-			{
-				std::cout << "Page: "<< it->first << std::endl;
-			}
-			
+
+			newApp->readFromBuffer(&buffer);
+
+			newApp->printMe();
+			server.addReplaceApplication(appName,newApp);
 		}
 	}
-	system("pause");
-	
-	//server.addPages({ "/home", [](){return new HomePage();} });
-	//server.addReplaceRule("/*/","/index.html",false);
-	/*
+
+
 	server.setLog(true);
 	server.start(8888, ExePath()+"\\web\\");
 	std::cout << "Server is Live " << std::endl;
@@ -82,7 +73,7 @@ int main()
 	{
 		Sleep(5);
 	}
-	*/
+	
 	return 0;
 }
 

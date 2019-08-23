@@ -80,6 +80,7 @@ public:
 	{
 		buffer->writestring((char*)method.c_str());
 		buffer->writestring((char*)response.c_str());
+		writeStringMapToBuffer(&parameters,buffer);
 		writeStringMapToBuffer(&requestHeaders,buffer);
 		writeStringMapToBuffer(&responseHeaders,buffer);
 		writeStringMapToBuffer(&cookies,buffer);
@@ -96,6 +97,7 @@ public:
 	{
 		method = buffer->readstring();
 		response = buffer->readstring();
+		readStringMapFromBuffer(&parameters,buffer);
 		readStringMapFromBuffer(&requestHeaders,buffer);
 		readStringMapFromBuffer(&responseHeaders,buffer);
 		readStringMapFromBuffer(&cookies,buffer);
