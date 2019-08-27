@@ -75,6 +75,13 @@ public:
 	std::map <std::string, std::string> requestHeaders;
 	std::map <std::string, std::string> responseHeaders;
 
+	std::map <std::string, std::string> *getRequestHeaders()
+	{return &requestHeaders;};
+	std::map <std::string, std::string> *getResponseHeaders()
+	{return &responseHeaders;};
+		std::map <std::string, FCookie> * getNewCookiesMap()
+	{return &newcookies;}
+
 	void writeToBuffer(CBuffer *buffer)
 	{
 		buffer->writestring((char*)method.c_str());

@@ -2,6 +2,12 @@
 
 #include "includes.h"
 
+void printAndWait(std::string what)
+{
+	std::cout << what << std::endl;
+	system("pause");
+};
+
 static ssize_t file_reader(void *cls, uint64_t pos, char *buf, size_t max)
 {
 	FILE *file = (FILE*)cls;
@@ -141,21 +147,15 @@ protected:
  
 		if (NULL == session)
 			return;
-
 		if (session->method.compare(MHD_HTTP_METHOD_POST)==0)
 		{
 			MHD_destroy_post_processor(session->pp);
 		}
-
 		delete session;
 		*con_cls = NULL;
 	}
 
-	void printAndWait(std::string what)
-	{
-		std::cout << what << std::endl;
-		system("pause");
-	};
+
 	
 	virtual int answer(void *cls, struct MHD_Connection *connection, const char *url, const char *method, const char *version, const char *upload_data, size_t *upload_data_size, void **con_cls)
 	{
@@ -214,26 +214,30 @@ protected:
 		{
 			requestedPath = selectAppName.substr(barPos,std::string::npos);
 			selectAppName = "/" + selectAppName.substr(0,barPos);
-			
 		}
 		else
 		{
 			selectAppName = "/" + selectAppName;
 			requestedPath = "";
 		}
-		std::cout << "AppName " << selectAppName << " Request Path: " <<  requestedPath << std::endl;
+		if (log)
+			std::cout << "AppName " << selectAppName << " Request Path: " <<  requestedPath << std::endl;
 		
 		FApplicationDefinition* selectedApp = NULL;
+		bool appNotFound;
 		try{
 			selectedApp = applications.at(selectAppName);
 			if (requestedPath.compare("")==0)
 				requestedPath = selectedApp->defaultIndexName;
 		}catch(std::out_of_range e)
 		{
-			std::cout << "Base Path - App Not Found" << std::endl;
-			ret = MHD_queue_response(connection, MHD_HTTP_NOT_FOUND, response);
-			MHD_destroy_response(response);
-			return ret;
+			if (log)
+				std::cout << "Base Path - App Not Found" << std::endl;
+			appNotFound = true;
+		}
+		if (appNotFound)
+		{
+			
 		}
 
 		try
@@ -252,54 +256,12 @@ protected:
 			buffer.readint();
 			newSession->readFromBuffer(&buffer);
 			newSession->pp = session->pp;
-			delete session;
+			//delete session;
 			session = newSession;
 
 			std::cout << session->response;
 
-			return MHD_YES;
-
-			FPage *answerPage;// = (*selectedApp).pages.at(stdurl)();
-			std::string endCookie;
-			std::map <std::string, FCookie> *newcookiesmap;
-			answerPage->setUpPage(session);
-
-			try
-			{
-				if (strcmp(method, MHD_HTTP_METHOD_GET) == 0)
-					answerPage->doGet();
-				else
-					if (strcmp(method, MHD_HTTP_METHOD_POST) == 0)
-					{
-						MHD_post_process(session->pp,
-							upload_data,
-							*upload_data_size);
-
-						if (0 != *upload_data_size)
-						{
-							*upload_data_size = 0;
-							return MHD_YES;
-						}
-						answerPage->doPost();
-					}
-					else
-						if (strcmp(method, MHD_HTTP_METHOD_PUT) == 0)
-						{
-							std::cout << "Doing Put" << std::endl;
-							answerPage->doPut();
-						}
-						else
-							if (strcmp(method, MHD_HTTP_METHOD_PATCH) == 0)
-								answerPage->doPatch();
-							else
-								if (strcmp(method, MHD_HTTP_METHOD_DELETE) == 0)
-									answerPage->doDelete();
-			} catch (std::exception e)
-			{
-				answerPage->setOut(PINTERNAL_ERROR);
-			}
-
-			myOut = (char*)malloc(answerPage->out.length()+1);
+			myOut = (char*)malloc(session->response.length()+1);
 			if (myOut == NULL)
 			{
 				response = MHD_create_response_from_buffer(strlen(PINTERNAL_ERROR),
@@ -309,20 +271,21 @@ protected:
 				ret = MHD_queue_response(connection, MHD_HTTP_INTERNAL_SERVER_ERROR, response);
 				MHD_destroy_response(response);
 			}
-			strcpy(myOut, answerPage->out.c_str());
+			strcpy(myOut, session->response.c_str());
 			
 			response = MHD_create_response_from_buffer(strlen(myOut),
 				(void *)myOut,
 				MHD_RESPMEM_MUST_FREE);
 
-			std::map<std::string, std::string> *responseHeaders = answerPage->getResponseHeaders();
+			std::map<std::string, std::string> *responseHeaders = session->getResponseHeaders();
 			//add response headers
 			for ( auto it = responseHeaders->begin(); it != responseHeaders->end(); it++ )
 			{
 				MHD_add_response_header(response, it->first.c_str(), it->second.c_str());
 			}
 			
-			newcookiesmap = answerPage->getNewCookiesMap();
+			auto newcookiesmap = session->getNewCookiesMap();
+			std::string endCookie;
 			for (std::map<std::string, FCookie>::iterator it = newcookiesmap->begin(); it != newcookiesmap->end(); ++it)
 			{
 				endCookie = it->first + "=" + it->second.value;
@@ -333,8 +296,7 @@ protected:
 				if (MHD_NO == MHD_add_response_header(response,MHD_HTTP_HEADER_SET_COOKIE,endCookie.c_str()))
 					std::cout << "error setting cookie" << std::endl;
 			}
-			
-			delete answerPage;
+			delete session;
 		}
 		catch (std::out_of_range e)
 		{
@@ -398,9 +360,6 @@ protected:
 	}
 
 public:
-	/*
-		Example addPages( { "/home", [](){return new HomePage(); } } )
-	*/
 
 	void setLog(bool state)
 	{

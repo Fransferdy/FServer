@@ -56,7 +56,6 @@ int main()
 			int *dataSize = (int*)dataBuffer;
 			buffer.addBuffer(dataBuffer,(*dataSize));
 			buffer.readint();
-
 			newApp->readFromBuffer(&buffer);
 
 			newApp->printMe();
@@ -65,7 +64,7 @@ int main()
 	}
 
 
-	server.setLog(true);
+	server.setLog(false);
 	server.start(8888, ExePath()+"\\web\\");
 	std::cout << "Server is Live " << std::endl;
 
