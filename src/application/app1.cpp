@@ -14,13 +14,14 @@
 
 Fapplication application;
 
-	void printAndWait(std::string what)
-	{
-		std::cout << what << std::endl;
-		system("pause");
-	};
-    
-char* executePagepp(char * bufferizedRequest, char* pageMapping,int bufferLength)
+void printAndWait(std::string what)
+{
+    std::cout << what << std::endl;
+    system("pause");
+};
+
+
+int executePagepp(char * bufferizedRequest, char* pageMapping,int bufferLength)
 {
     FRequest request;
     CBuffer buffer;
@@ -33,10 +34,18 @@ char* executePagepp(char * bufferizedRequest, char* pageMapping,int bufferLength
     request.writeToBuffer(&buffer);
     buffer.replaceint(buffer.BuffSize,0);
 
-    char * retData = (char*)malloc(buffer.BuffSize);
-    memcpy(retData,buffer.data,buffer.BuffSize);
+    
+    int bufferHandle = application.addPageResult(&buffer);
 
-    return retData;
+    return bufferHandle;
+}
+char * getResultPage(int handle)
+{
+    return application.getResultPage(handle);
+}
+void deleteResultPage(int handle)
+{
+    application.deleteResultPage(handle);
 }
 
 char * getApplicationDefinitions()
@@ -54,18 +63,23 @@ char * getApplicationDefinitions()
 
 extern "C"
 {
-    DLLAPI char* executepage(char * source,char* pageMapping,int bufferLength)
+    DLLAPI int executepage(char * source,char* pageMapping,int bufferLength)
     {
         return executePagepp(source,pageMapping,bufferLength); 
+    }
+    DLLAPI char* getPageResult(int handle)
+    {
+        return getResultPage(handle); 
+    }
+    DLLAPI void deletePageResult(int handle)
+    {
+        return deleteResultPage(handle); 
     }
     DLLAPI char* getApp()
     {
         return getApplicationDefinitions();
     }
 }
-
-
-
 
 extern "C" DLLAPI BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD reason_for_call, LPVOID lpvReserved)
 {

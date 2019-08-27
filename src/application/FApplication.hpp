@@ -16,19 +16,71 @@
 #define FHTTP_HEAD "HEAD"
 #define FHTTP_OPTIONS "OPTIONS"
 
+#define MAX_MINIMUN_SIZE_T 65535
+
 class Fapplication
 {
-protected:
+private:
 	std::map<std::string, std::function<FPage*()> > pages;
 	std::map<std::string, std::pair<bool, std::string> > replaceRules;
+	std::map<int,char*> pageResults;
 	std::string defaultIndexName;
+	int pageResultId=0;
+
 	void printAndWait(std::string what)
 	{
 		std::cout << what << std::endl;
 		system("pause");
 	};
 
+	int generatePageResultId()
+	{
+		pageResultId++;
+		if (pageResultId>MAX_MINIMUN_SIZE_T)
+			pageResultId=0;
+		return pageResultId;
+	}
+
+
 public:	
+	int addPageResult(CBuffer* buffer)
+	{
+		int handle = generatePageResultId();
+
+		char * retData = (char*)malloc(buffer->BuffSize);
+    	memcpy(retData,buffer->data,buffer->BuffSize);
+
+		pageResults.insert(std::pair<int,char*>(handle,retData));
+		std::cout << "Page Result Added to Pool" << std::endl;
+		return handle;
+	}
+	void deleteResultPage(int handle)
+	{
+		char * deleteBuffer = NULL;
+		try{
+			deleteBuffer = pageResults.at(handle);
+			free(deleteBuffer);
+			pageResults.erase(handle);
+			std::cout << "Page Result Erased" << std::endl;
+		}catch(std::out_of_range e)
+		{
+			std::cout << "Error: Trying to DELETE a Page Result that does not exist" << std::endl;
+		}
+	}
+	char* getResultPage(int handle)
+	{
+		char * retBuffer = NULL;
+		try{
+			retBuffer = pageResults.at(handle);
+			std::cout << "Page Result Retrieved" << std::endl;
+		}catch(std::out_of_range e)
+		{
+			std::cout << "Error: Trying to GET a Page Result that was not created" << std::endl;
+		}
+		return retBuffer;
+	}
+
+
 	virtual void answer(FRequest *request, const char *url)
 	{
 		FPage *answerPage = pages.at(url)();

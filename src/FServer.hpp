@@ -41,7 +41,9 @@ static int post_iterator(void *cls,enum MHD_ValueKind kind,const char *key,const
 	return MHD_YES;
 }
 
-typedef char* (__cdecl *ExecutePageProc)(char * bufferizedRequest,char* url,int length);
+typedef int (__cdecl *ExecutePageProc)(char * bufferizedRequest,char* url,int length);
+typedef char* (__cdecl *GetPageProc)(int handle);
+typedef void (__cdecl *DeletePageProc)(int handle);
 
 class FApplicationDefinition
 {
@@ -51,12 +53,17 @@ public:
 	std::map<std::string, boolean > pages;
 	std::map<std::string, std::pair<bool, std::string> > replaceRules;
 	ExecutePageProc executePage;
+	GetPageProc getPageResult;
+	DeletePageProc deletePageResult;
+	
 	void *dllHandle;
 
-	FApplicationDefinition(std::string appNameArg, ExecutePageProc executePageArg,void *dllHandleArg)
+	FApplicationDefinition(std::string appNameArg, ExecutePageProc executePageArg,DeletePageProc deletePageResultArg,GetPageProc getPageResultArg,void *dllHandleArg)
 	{
 		appName = appNameArg;
 		executePage = executePageArg;
+		getPageResult = getPageResultArg;
+		deletePageResult = deletePageResultArg;
 		dllHandle = dllHandleArg;
 	}
 	~FApplicationDefinition()
@@ -118,6 +125,26 @@ public:
 	}
 
 };
+
+FRequest * createRequestFromApplicationBufferizedResult(FRequest *session,FApplicationDefinition* selectedApp,std::string requestedPath)
+{
+	CBuffer buffer;
+	buffer.clear();
+	session->writeToBuffer(&buffer);
+	int filledRequestHandle = selectedApp->executePage(buffer.data,(char*)requestedPath.c_str(),buffer.BuffSize);
+	char * filledRequestRaw = selectedApp->getPageResult(filledRequestHandle);
+	int *filledRequestSize = (int*)filledRequestRaw;
+
+	FRequest *newSession = new FRequest();
+	buffer.clear();
+	buffer.addBuffer(filledRequestRaw,*filledRequestSize);
+	buffer.readint();
+	newSession->readFromBuffer(&buffer);
+	newSession->pp = session->pp;
+
+	selectedApp->deletePageResult(filledRequestHandle);
+	return newSession;
+}
 
 class FServer
 {
@@ -224,7 +251,7 @@ protected:
 			std::cout << "AppName " << selectAppName << " Request Path: " <<  requestedPath << std::endl;
 		
 		FApplicationDefinition* selectedApp = NULL;
-		bool appNotFound;
+		bool appNotFound=false;
 		try{
 			selectedApp = applications.at(selectAppName);
 			if (requestedPath.compare("")==0)
@@ -237,124 +264,117 @@ protected:
 		}
 		if (appNotFound)
 		{
-			
-		}
-
-		try
-		{
-			bool pageExist = selectedApp->pages.at(requestedPath);
-			session->method = method;
-			CBuffer buffer;
-			buffer.clear();
-			session->writeToBuffer(&buffer);
-			char * filledRequest = selectedApp->executePage(buffer.data,(char*)requestedPath.c_str(),buffer.BuffSize);
-			int *filledRequestSize = (int*)filledRequest;
-
-			FRequest *newSession = new FRequest();
-			buffer.clear();
-			buffer.addBuffer(filledRequest,*filledRequestSize);
-			buffer.readint();
-			newSession->readFromBuffer(&buffer);
-			newSession->pp = session->pp;
-			//delete session;
-			session = newSession;
-
-			std::cout << session->response;
-
-			myOut = (char*)malloc(session->response.length()+1);
-			if (myOut == NULL)
+			response = MHD_create_response_from_buffer(strlen(PNOT_FOUND),
+				(void *)PNOT_FOUND,
+				MHD_RESPMEM_PERSISTENT);
+			ret = MHD_queue_response(connection, MHD_HTTP_NOT_FOUND, response);
+			MHD_destroy_response(response);
+			return ret;
+			//get a root file response
+		}else
+		{//get an app response
+			try
 			{
-				response = MHD_create_response_from_buffer(strlen(PINTERNAL_ERROR),
-					(void *)PINTERNAL_ERROR,
-					MHD_RESPMEM_PERSISTENT);
+				bool pageExist = selectedApp->pages.at(requestedPath);
+				session->method = method;
+				
+				FRequest *newSession = createRequestFromApplicationBufferizedResult(session,selectedApp,requestedPath);
+				session = newSession;//note that the old session was a secondary pointer to a resource that is dealloacted by the end of the http request execution(by its primary pointer)
 
-				ret = MHD_queue_response(connection, MHD_HTTP_INTERNAL_SERVER_ERROR, response);
-				MHD_destroy_response(response);
-			}
-			strcpy(myOut, session->response.c_str());
-			
-			response = MHD_create_response_from_buffer(strlen(myOut),
-				(void *)myOut,
-				MHD_RESPMEM_MUST_FREE);
-
-			std::map<std::string, std::string> *responseHeaders = session->getResponseHeaders();
-			//add response headers
-			for ( auto it = responseHeaders->begin(); it != responseHeaders->end(); it++ )
-			{
-				MHD_add_response_header(response, it->first.c_str(), it->second.c_str());
-			}
-			
-			auto newcookiesmap = session->getNewCookiesMap();
-			std::string endCookie;
-			for (std::map<std::string, FCookie>::iterator it = newcookiesmap->begin(); it != newcookiesmap->end(); ++it)
-			{
-				endCookie = it->first + "=" + it->second.value;
-				if (it->second.date.compare("") != 0)
-					endCookie += "; expires=" + it->second.date;
-				if (it->second.path.compare("")!=0)
-					endCookie += "; path=" + it->second.path;
-				if (MHD_NO == MHD_add_response_header(response,MHD_HTTP_HEADER_SET_COOKIE,endCookie.c_str()))
-					std::cout << "error setting cookie" << std::endl;
-			}
-			delete session;
-		}
-		catch (std::out_of_range e)
-		{
-			//std::cout << "Looking for file " << url << std::endl;
-			
-			if (log)
-				std::cout << "Modified URL" << stdurl << std::endl;
-
-			if (stdurl.compare("/") == 0)
-				stdurl = "/index.html";
-			
-			std::string path = (rootPath + stdurl).c_str();
-			path = FUtils::absolutePath(path);
-
-			if (log)
-				std::cout << "File Path " << path << std::endl;
-
-			std::size_t found = path.find(rootPath);
-			if (found == std::string::npos) //Requested file is not below root tree
-			{
-				response = MHD_create_response_from_buffer(strlen(PFORBIDDEN),
-					(void *)PFORBIDDEN,
-					MHD_RESPMEM_PERSISTENT);
-
-				ret = MHD_queue_response(connection, MHD_HTTP_FORBIDDEN, response);
-				MHD_destroy_response(response);
-				return ret;
-			}
-
-			FILE *file;
-			file = fopen(path.c_str(), "rb");
-			if (file != NULL)
-			{
-				response = MHD_create_response_from_callback(FUtils::filesize(path.c_str()), 32 * 1024,     /* 32k page size */
-				&file_reader,
-				file,
-				&free_callback);
-
-				if (response == NULL)
+				myOut = (char*)malloc(session->response.length()+1);
+				if (myOut == NULL)
 				{
-					fclose(file);
-					return MHD_NO;
+					response = MHD_create_response_from_buffer(strlen(PINTERNAL_ERROR),
+						(void *)PINTERNAL_ERROR,
+						MHD_RESPMEM_PERSISTENT);
+
+					ret = MHD_queue_response(connection, MHD_HTTP_INTERNAL_SERVER_ERROR, response);
+					MHD_destroy_response(response);
 				}
-				MHD_add_response_header(response, "Cache-Control", "public, max-age=1800");
+				strcpy(myOut, session->response.c_str());
+				
+				response = MHD_create_response_from_buffer(strlen(myOut),
+					(void *)myOut,
+					MHD_RESPMEM_MUST_FREE);
+
+				std::map<std::string, std::string> *responseHeaders = session->getResponseHeaders();
+				//add response headers
+				for ( auto it = responseHeaders->begin(); it != responseHeaders->end(); it++ )
+				{
+					MHD_add_response_header(response, it->first.c_str(), it->second.c_str());
+				}
+				
+				auto newcookiesmap = session->getNewCookiesMap();
+				std::string endCookie;
+				for (std::map<std::string, FCookie>::iterator it = newcookiesmap->begin(); it != newcookiesmap->end(); ++it)
+				{
+					endCookie = it->first + "=" + it->second.value;
+					if (it->second.date.compare("") != 0)
+						endCookie += "; expires=" + it->second.date;
+					if (it->second.path.compare("")!=0)
+						endCookie += "; path=" + it->second.path;
+					if (MHD_NO == MHD_add_response_header(response,MHD_HTTP_HEADER_SET_COOKIE,endCookie.c_str()))
+						std::cout << "error setting cookie" << std::endl;
+				}
+				delete session;
 			}
-			else
+			catch (std::out_of_range e)
 			{
-				response = MHD_create_response_from_buffer(strlen(PNOT_FOUND),
-					(void *)PNOT_FOUND,
-					MHD_RESPMEM_PERSISTENT);
-				ret = MHD_queue_response(connection, MHD_HTTP_NOT_FOUND, response);
-				MHD_destroy_response(response);
-				return ret;
+				//std::cout << "Looking for file " << url << std::endl;
+				
+				if (log)
+					std::cout << "Modified URL" << stdurl << std::endl;
+
+				if (stdurl.compare("/") == 0)
+					stdurl = "/index.html";
+				
+				std::string path = (rootPath + stdurl).c_str();
+				path = FUtils::absolutePath(path);
+
+				if (log)
+					std::cout << "File Path " << path << std::endl;
+
+				std::size_t found = path.find(rootPath);
+				if (found == std::string::npos) //Requested file is not below root tree
+				{
+					response = MHD_create_response_from_buffer(strlen(PFORBIDDEN),
+						(void *)PFORBIDDEN,
+						MHD_RESPMEM_PERSISTENT);
+
+					ret = MHD_queue_response(connection, MHD_HTTP_FORBIDDEN, response);
+					MHD_destroy_response(response);
+					return ret;
+				}
+
+				FILE *file;
+				file = fopen(path.c_str(), "rb");
+				if (file != NULL)
+				{
+					response = MHD_create_response_from_callback(FUtils::filesize(path.c_str()), 32 * 1024,     /* 32k page size */
+					&file_reader,
+					file,
+					&free_callback);
+
+					if (response == NULL)
+					{
+						fclose(file);
+						return MHD_NO;
+					}
+					MHD_add_response_header(response, "Cache-Control", "public, max-age=1800");
+				}
+				else
+				{
+					response = MHD_create_response_from_buffer(strlen(PNOT_FOUND),
+						(void *)PNOT_FOUND,
+						MHD_RESPMEM_PERSISTENT);
+					ret = MHD_queue_response(connection, MHD_HTTP_NOT_FOUND, response);
+					MHD_destroy_response(response);
+					return ret;
+				}
 			}
 		}
 
 		ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
-		
 		MHD_destroy_response(response);
 		return ret;
 	}

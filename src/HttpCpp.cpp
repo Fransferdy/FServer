@@ -48,8 +48,10 @@ int main()
 
 			ExecutePageProc executePage = (ExecutePageProc)GetProcAddress(temp, "executepage");
 			GetAppProc getApp = (GetAppProc)GetProcAddress(temp, "getApp");
+			DeletePageProc deletePage = (DeletePageProc)GetProcAddress(temp, "deletePageResult");
+			GetPageProc getPage = (GetPageProc)GetProcAddress(temp, "getPageResult");
 
-			FApplicationDefinition *newApp = new FApplicationDefinition(appName,executePage,(void*)temp);
+			FApplicationDefinition *newApp = new FApplicationDefinition(appName,executePage,deletePage,getPage,(void*)temp);
 
 			CBuffer buffer;
 			char *dataBuffer = getApp();
