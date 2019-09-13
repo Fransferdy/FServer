@@ -2,7 +2,6 @@
 
 #include "includes.h"
 
-
 class HomePage : public FPage
 {
 	virtual void doPost()

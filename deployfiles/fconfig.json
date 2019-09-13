@@ -1,0 +1,6 @@
+{
+    "rootAppName":"app1",
+    "logging":false,
+    "port":8888,
+    "mode":"thread"
+}

@@ -174,6 +174,8 @@ public:
 class FApplicationDefinition
 {
 public:
+
+
 	std::map<std::string, boolean > pages;
 	std::map<std::string, std::pair<bool, std::string> > replaceRules;
 	

@@ -9,7 +9,7 @@ public:
 	std::string path;
 	std::string name;
 	std::string md5hash;
-	int size;
+	size_t size;
 
 	std::string getHash(std::string basedir)
 	{

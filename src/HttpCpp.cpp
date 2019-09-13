@@ -20,10 +20,12 @@ typedef char* (__cdecl *GetAppProc)(void);
 
 int main()
 {
+	json::JSON config;
+	
 	std::map<std::string,HINSTANCE> modules;
 
 	FilesManager fmag;
-	fmag.populateFromDir(".\\apps\\");
+	fmag.populateFromDir(".\\deployfiles\\runningapps\\");
 	fmag.filesPrintAll();
 	auto files = fmag.getFiles();
 	std::string appsDir = fmag.getBaseDir();
