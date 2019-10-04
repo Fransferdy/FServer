@@ -48,7 +48,9 @@ Go to the project folder.
 Before you can build FServer you need to create two folders.
 
 mkdir obj
+
 mkdir obj/src
+
 mkdir deployfiles/runningapps
 
 After that just run 

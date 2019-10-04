@@ -61,6 +61,7 @@
         "numeric": "cpp",
         "random": "cpp",
         "cinttypes": "cpp",
-        "codecvt": "cpp"
+        "codecvt": "cpp",
+        "cstring": "cpp"
     }
 }
