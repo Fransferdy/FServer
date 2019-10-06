@@ -1,6 +1,6 @@
-{
-    "rootAppName":"app1",
+{ 
+    "rootAppName":"app2",
     "logging":false,
     "port":8888,
     "mode":"thread"
-}
+ }

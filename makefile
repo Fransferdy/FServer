@@ -1,6 +1,6 @@
 ##################Pasta:sub-make ## Makefile ###################
 CC=g++
-CPPFLAGS=-fno-trapping-math -O3 -std=c++17 -D_FORCE_INLINES
+CPPFLAGS=-fno-trapping-math -O3 -std=c++17 -D_FORCE_INLINES -I./src/include
 LIBS =-lm -lmicrohttpd #### -lcurl####
 EXEC=fserver.exe
 SRC_DIR := src

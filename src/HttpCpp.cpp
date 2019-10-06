@@ -1,9 +1,8 @@
-#include "json.hpp"
+#include "jsoncons/json.hpp"
 #include "includes.h"
 
 #include "FServer.hpp"
-
-#include "HomePage.h"
+#include "SmartFileReader.hpp"
 
 FServer server;
 std::string ExePath()
@@ -20,7 +19,16 @@ typedef char* (__cdecl *GetAppProc)(void);
 
 int main()
 {
-	json::JSON config;
+
+	SmartFileReader myReader(0.00008);
+	myReader.setFileCacheGracePeriod(1);
+	CachedFileData* cacheFile = myReader.getFile(".\\deployfiles\\fconfig.json");
+	system("pause");
+	cacheFile = myReader.getFile(".\\deployfiles\\fconfig.json");
+	std::string fileData;
+	fileData.insert(0,cacheFile->data,cacheFile->size);
+	jsoncons::json config = jsoncons::json::parse(fileData);
+	std::cout << config << std::endl;
 	
 	std::map<std::string,HINSTANCE> modules;
 
