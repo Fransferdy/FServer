@@ -20,8 +20,7 @@ typedef char* (__cdecl *GetAppProc)(void);
 int main()
 {
 
-	SmartFileReader myReader(0.00008);
-	myReader.setFileCacheGracePeriod(1);
+	SmartFileReader myReader(0);
 	CachedFileData* cacheFile = myReader.getFile(".\\deployfiles\\fconfig.json");
 	system("pause");
 	cacheFile = myReader.getFile(".\\deployfiles\\fconfig.json");
@@ -29,7 +28,12 @@ int main()
 	fileData.insert(0,cacheFile->data,cacheFile->size);
 	jsoncons::json config = jsoncons::json::parse(fileData);
 	std::cout << config << std::endl;
-	
+
+	std::string rootAppName = config["rootAppName"].as<std::string>();
+	bool logging = config["logging"].as<bool>();
+	int port = config["port"].as<int>();
+	std::string serverMode = config["mode"].as<std::string>();
+
 	std::map<std::string,HINSTANCE> modules;
 
 	FilesManager fmag;
