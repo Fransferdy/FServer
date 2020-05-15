@@ -25,9 +25,12 @@ static int parameters_iterator(void *cls, enum MHD_ValueKind kind, const char *k
 {
 	std::string myKey, myValue;
 	myKey = key;
-	myValue = value;
-	std::map <std::string, std::string> *parameters = (std::map <std::string, std::string>*)cls;
-	parameters->emplace(FUtils::urlDecode(myKey), FUtils::urlDecode(myValue));
+	if (value!=NULL)
+	{
+		myValue = value;
+		std::map <std::string, std::string> *parameters = (std::map <std::string, std::string>*)cls;
+		parameters->emplace(FUtils::urlDecode(myKey), FUtils::urlDecode(myValue));
+	}
 	return MHD_YES;
 }
 
@@ -35,9 +38,12 @@ static int post_iterator(void *cls,enum MHD_ValueKind kind,const char *key,const
 {
 	std::string myKey, myData;
 	myKey = key;
-	myData = data;
-	std::map <std::string, std::string> *parameters = (std::map <std::string, std::string>*)cls;
-	parameters->emplace(FUtils::urlDecode(myKey), FUtils::urlDecode(myData));
+	if (data!=NULL)
+	{
+		myData = data;
+		std::map <std::string, std::string> *parameters = (std::map <std::string, std::string>*)cls;
+		parameters->emplace(FUtils::urlDecode(myKey), FUtils::urlDecode(myData));
+	}
 	return MHD_YES;
 }
 
@@ -102,7 +108,7 @@ public:
 		bool ruleState = false;
 		for ( size_t i = 0; i< size; i++)
 		{
-			replaceRules.insert(std::pair<std::string, std::pair<bool, std::string> >(buffer->readstring(), std::pair<bool, std::string>(buffer->readdouble,buffer->readstring()) ) );
+			replaceRules.insert(std::pair<std::string, std::pair<bool, std::string> >(buffer->readstring(), std::pair<bool, std::string>(buffer->readbyte(),buffer->readstring()) ) );
 		}
 		defaultIndexName = buffer->readstring();
 	}
@@ -190,14 +196,18 @@ protected:
 		struct MHD_Response *response;
 		FRequest *session;
 		char * myOut;
+	
+
 		if (*con_cls==NULL)
 		{
+
 			session = new FRequest();
 			if (NULL == session)
 				return MHD_NO;
 
-			session->method = method;
 
+			session->method = method;
+			
 			MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, &parameters_iterator,
 				&session->parameters);
 
@@ -206,6 +216,7 @@ protected:
 
 			MHD_get_connection_values(connection, MHD_HEADER_KIND, &parameters_iterator,
 				&session->requestHeaders);
+
 				
 			if (0 == strcmp(method, "POST"))
 			{

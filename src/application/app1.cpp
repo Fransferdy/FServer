@@ -11,8 +11,18 @@
 
 #define DLLAPI __declspec(dllexport)
 
+#include "HomePage.h"
+class MyApplication:public Fapplication
+{
+public:
+    void start()
+    {
+		addPage( { "/index", [](){return new HomePage(); } } );
+        setDefaultIndexEndPoint("/index");
+    }
+};
 
-Fapplication application;
+MyApplication application;
 
 void printAndWait(std::string what)
 {
@@ -21,20 +31,19 @@ void printAndWait(std::string what)
 };
 
 
-int executePagepp(char * bufferizedRequest, char* pageMapping,int bufferLength)
+int executePagepp(char * bufferizedRequest, char* matchedPath,int bufferLength)
 {
     FRequest request;
     CBuffer buffer;
     buffer.addBuffer(bufferizedRequest,bufferLength);
     request.readFromBuffer(&buffer);
-    application.answer(&request,pageMapping);
+    application.answer(&request,matchedPath);
 
     buffer.clear();
     buffer.writeint(0);
     request.writeToBuffer(&buffer);
     buffer.replaceint(buffer.BuffSize,0);
 
-    
     int bufferHandle = application.addPageResult(&buffer);
 
     return bufferHandle;
@@ -49,15 +58,8 @@ void deleteResultPage(int handle)
 }
 
 char * getApplicationDefinitions()
-{
-    CBuffer buffer;
-    buffer.clear();
-    buffer.writeint(0);
-    application.writeToBuffer(&buffer);
-    buffer.replaceint(buffer.BuffSize,0);
-    char * retData = (char*)malloc(buffer.BuffSize);
-    memcpy(retData,buffer.data,buffer.BuffSize);
-    return retData;
+{  
+    return application.getApplicationDefinitions();
 }
 
 

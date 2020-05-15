@@ -80,7 +80,7 @@ int main()
 	}
 
 
-	server.setLog(false);
+	server.setLog(true);
 	server.start(8888, ExePath()+"\\web\\");
 	std::cout << "Server is Live " << std::endl;
 

@@ -6,7 +6,7 @@
 #include <functional>
 #include <algorithm>
 #include "FPage.hpp"
-#include "HomePage.h"
+
 
 #define FHTTP_GET "GET"
 #define FHTTP_POST "POST"
@@ -26,6 +26,7 @@ private:
 	std::map<int,char*> pageResults;
 	std::string defaultIndexName;
 	int pageResultId=0;
+	char * applicationDefinitionBuffer=NULL;
 
 	void printAndWait(std::string what)
 	{
@@ -41,8 +42,33 @@ private:
 		return pageResultId;
 	}
 
-
 public:	
+	~Fapplication()
+	{
+		if (applicationDefinitionBuffer!=NULL)
+			free(applicationDefinitionBuffer);
+	}
+	void setDefaultIndexEndPoint(std::string endpoint)
+	{
+		defaultIndexName = endpoint;
+	}
+	char * getApplicationDefinitions()
+	{
+		if (applicationDefinitionBuffer!=NULL)
+			free(applicationDefinitionBuffer);
+
+		CBuffer buffer;
+		buffer.clear();
+		buffer.writeint(0);
+		writeToBuffer(&buffer);
+		buffer.replaceint(buffer.BuffSize,0);
+
+		applicationDefinitionBuffer = (char*)malloc(buffer.BuffSize);
+		memcpy(applicationDefinitionBuffer,buffer.data,buffer.BuffSize);
+
+		return applicationDefinitionBuffer;
+	}
+
 	int addPageResult(CBuffer* buffer)
 	{
 		int handle = generatePageResultId();
@@ -147,8 +173,13 @@ public:
 
 	virtual void start()
 	{
+		/*
+		//add pages here
+		example:
+
 		defaultIndexName = "/index";
 		addPage( { "/index", [](){return new HomePage(); } } );
+		*/
     }
 
 	void writeToBuffer(CBuffer *buffer)
@@ -164,7 +195,6 @@ public:
 			buffer->writestring((char*)it->first.c_str());
 			buffer->writebyte(it->second.first);
 			buffer->writestring((char*)it->second.second.c_str());
-			
 		}
 		buffer->writestring((char*)defaultIndexName.c_str());
 	}
@@ -174,8 +204,6 @@ public:
 class FApplicationDefinition
 {
 public:
-
-
 	std::map<std::string, boolean > pages;
 	std::map<std::string, std::pair<bool, std::string> > replaceRules;
 	
@@ -191,7 +219,7 @@ public:
 		bool ruleState = false;
 		for ( size_t i = 0; i< size; i++)
 		{
-			replaceRules.insert(std::pair<std::string, std::pair<bool, std::string> >(buffer->readstring(), std::pair<bool, std::string>(buffer->readdouble,buffer->readstring()) ) );
+			replaceRules.insert(std::pair<std::string, std::pair<bool, std::string> >(buffer->readstring(), std::pair<bool, std::string>(buffer->readbyte(),buffer->readstring()) ) );
 		}
 	}
 
